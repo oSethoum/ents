@@ -1,0 +1,7 @@
+{{ range .Schemas }}
+    export interface I{{ pascal .Name }} {
+        {{ range .Fields }}
+        {{ tag . }}: {{ .Type }};
+        {{- end}}
+    }
+{{- end  }}
