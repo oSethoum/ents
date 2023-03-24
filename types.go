@@ -12,3 +12,14 @@ type extension struct {
 }
 
 type Comparable interface{ ~string | ~int | ~float32 }
+
+var gots = map[string]string{
+	"time.Time": "string",
+	"bool":      "Boolean",
+	"int":       "number",
+	"float":     "number",
+	"enum":      "string",
+	"any":       "any",
+	"other":     "any",
+	"json":      "any",
+}

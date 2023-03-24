@@ -1,7 +1,50 @@
-{{ range .Schemas }}
-    export interface I{{ pascal .Name }} {
-        {{ range .Fields }}
-        {{ tag . }}: {{ .Type }};
-        {{- end}}
+{{ $g := . }}
+{{ range $s := .Schemas }}
+export interface {{ pascal .Name }} {
+    {{ range .Fields }}
+        {{ get_name . }}{{- if or .Optional .Nillable }}?{{- end}}: {{ get_type .Info }};
+    {{- end}}
+    {{- $ed := len .Edges }}
+    {{- if gt $ed 0 }}
+    edges:{
+    {{- range .Edges }}
+    {{ camel .Name }}?: {{ pascal .Type }} {{- if not .Unique}}[]{{- end}};
+    {{- end}}
     }
-{{- end  }}
+    {{- end}}
+}
+
+export interface {{ pascal .Name }}CreateInput{
+    {{ range .Fields }}
+        {{ get_name . }}{{- if or .Optional .Nillable .Default }}?{{- end}}: {{ get_type .Info }};
+    {{- end}}
+    {{- range .Edges}}
+        {{- if .Unique}}
+            {{ camel .Name }}Id{{- if not .Required}}?{{- end}}: {{ get_type $g.Config.IDType }};
+        {{- else}}
+            add{{ singular .Name | pascal }}Ids: {{ get_type $g.Config.IDType }}[];
+        {{- end  }}
+    {{- end}}
+}
+
+export interface {{ pascal .Name }}UpdateInput{
+    {{ range .Fields }}
+        {{ get_name . }}{{- if is_slice . | not }}?{{ end }}: {{ get_type .Info }};
+    {{- end}}
+    {{- range .Edges}}
+        {{- if .Unique}}
+            {{ camel .Name }}Id{{- if not .Required}}?{{- end}}: {{ get_type $g.Config.IDType }};
+        {{- else}}
+            add{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
+            remove{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
+            clear{{ pascal .Name }}?: Boolean;
+        {{- end  }}
+    {{- end}}
+}
+
+export interface {{ pascal .Name }}QueryInput {}
+
+export interface {{ pascal .Name }}WhereInput {}
+
+{{- end }}
+
