@@ -1,5 +1,8 @@
 {{ $g := . }}
+
+type OrderDirection = "ASC" | "DESC";
 {{ range $s := .Schemas }}
+
 export interface {{ pascal .Name }} {
     {{ range .Fields }}
         {{ get_name . }}{{- if or .Optional .Nillable }}?{{- end}}: {{ get_type .Info }};
@@ -42,9 +45,64 @@ export interface {{ pascal .Name }}UpdateInput{
     {{- end}}
 }
 
-export interface {{ pascal .Name }}QueryInput {}
+type {{ pascal .Name }}OrderField = {{ order_fields . }}
+type {{ pascal .Name }}SelectField = {{ select_fields . }}
 
-export interface {{ pascal .Name }}WhereInput {}
+export interface {{ pascal .Name }}Order {
+    field: {{ pascal .Name }}OrderField;
+    direction?: OrderDirection;
+}
+
+export interface {{ pascal .Name }}QueryInput {
+    select?: {{ pascal .Name }}SelectField[];
+    offset?: number;
+    limit?: number;
+    where?: {{ pascal .Name }}WhereInput;
+    order?: {{ pascal .Name }}Order[];
+}
+
+export interface {{ pascal .Name }}WhereInput {
+    not?: {{ pascal .Name }}WhereInput;  
+    or?: {{ pascal .Name }}WhereInput[];
+    and?: {{ pascal .Name }}WhereInput[];
+    {{- range .Fields }}
+        {{- if get_type .Info | eq "Boolean" }}
+            {{ camel .Name }}EQ?:  {{ get_type .Info }};
+            {{ camel .Name }}NEQ?: {{ get_type .Info }}; 
+        {{- end }}
+        {{- if comparable . }}
+            {{ camel .Name }}?: {{ get_type .Info }};
+            {{ camel .Name }}NEQ?: {{ get_type .Info }} 
+            {{ camel .Name }}In?: {{ get_type .Info }}[];
+            {{ camel .Name }}NotIn?: {{ get_type .Info }}[];
+            
+            {{- if enum_or_edge_filed $s . | not }}
+                {{ camel .Name }}GT?: {{ get_type .Info }};
+                {{ camel .Name }}GTE?: {{ get_type .Info }};
+                {{ camel .Name }}LT?: {{ get_type .Info }};
+                {{ camel .Name }}LTE?: {{ get_type .Info }};
+            {{- end }}
+        {{- end }}
+        {{- if .Optional }}
+            {{ camel .Name }}IsNil?: Boolean; 
+            {{ camel .Name }}NotNil?: Boolean;
+        {{- end }}
+        {{- if eq .Name "id" | not }}
+            {{- if get_type .Info | eq "string"}}
+                {{ camel .Name }}Contains?: string; 
+                {{ camel .Name }}HasPrefix?: string; 
+                {{ camel .Name }}HasSuffix?: string; 
+                {{ camel .Name }}ContainsFold?: string; 
+                {{ camel .Name }}EqualFold?: string; 
+            {{- end }}
+        {{- end }}
+    {{- end }}
+    {{- range .Edges}}
+    // "{{.Name}}" edge predicates.
+        has{{pascal .Name}}?: Boolean;		               
+        has{{pascal .Name}}With?: {{pascal .Type}}WhereInput;
+    {{- end}}
+}   
 
 {{- end }}
 
