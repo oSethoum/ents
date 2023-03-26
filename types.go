@@ -15,7 +15,7 @@ type Comparable interface{ ~string | ~int | ~float32 }
 
 var gots = map[string]string{
 	"time.Time": "string",
-	"bool":      "Boolean",
+	"bool":      "boolean",
 	"int":       "number",
 	"float":     "number",
 	"enum":      "string",

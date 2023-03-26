@@ -40,7 +40,7 @@ export interface {{ pascal .Name }}UpdateInput{
         {{- else}}
             add{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
             remove{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
-            clear{{ pascal .Name }}?: Boolean;
+            clear{{ pascal .Name }}?: boolean;
         {{- end  }}
     {{- end}}
 }
@@ -59,6 +59,9 @@ export interface {{ pascal .Name }}QueryInput {
     limit?: number;
     where?: {{ pascal .Name }}WhereInput;
     order?: {{ pascal .Name }}Order[];
+    {{- range .Edges }}
+    with{{ pascal .Name }}?: {{ pascal .Type }}QueryInput;
+    {{- end }}
 }
 
 export interface {{ pascal .Name }}WhereInput {
@@ -66,7 +69,7 @@ export interface {{ pascal .Name }}WhereInput {
     or?: {{ pascal .Name }}WhereInput[];
     and?: {{ pascal .Name }}WhereInput[];
     {{- range .Fields }}
-        {{- if get_type .Info | eq "Boolean" }}
+        {{- if get_type .Info | eq "boolean" }}
             {{ camel .Name }}EQ?:  {{ get_type .Info }};
             {{ camel .Name }}NEQ?: {{ get_type .Info }}; 
         {{- end }}
@@ -84,8 +87,8 @@ export interface {{ pascal .Name }}WhereInput {
             {{- end }}
         {{- end }}
         {{- if .Optional }}
-            {{ camel .Name }}IsNil?: Boolean; 
-            {{ camel .Name }}NotNil?: Boolean;
+            {{ camel .Name }}IsNil?: boolean; 
+            {{ camel .Name }}NotNil?: boolean;
         {{- end }}
         {{- if eq .Name "id" | not }}
             {{- if get_type .Info | eq "string"}}
@@ -99,7 +102,7 @@ export interface {{ pascal .Name }}WhereInput {
     {{- end }}
     {{- range .Edges}}
     // "{{.Name}}" edge predicates.
-        has{{pascal .Name}}?: Boolean;		               
+        has{{pascal .Name}}?: boolean;		               
         has{{pascal .Name}}With?: {{pascal .Type}}WhereInput;
     {{- end}}
 }   
