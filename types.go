@@ -11,12 +11,11 @@ type extension struct {
 	path  string
 }
 
-type Comparable interface{ ~string | ~int | ~float32 }
-
 var gots = map[string]string{
 	"time.Time": "string",
 	"bool":      "boolean",
 	"int":       "number",
+	"uint":      "number",
 	"float":     "number",
 	"enum":      "string",
 	"any":       "any",

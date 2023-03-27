@@ -22,11 +22,13 @@ export interface {{ pascal .Name }}CreateInput{
         {{ get_name . }}{{- if or .Optional .Nillable .Default }}?{{- end}}: {{ get_type .Info }};
     {{- end}}
     {{- range .Edges}}
-        {{- if .Unique}}
-            {{ camel .Name }}Id{{- if not .Required}}?{{- end}}: {{ get_type $g.Config.IDType }};
-        {{- else}}
-            add{{ singular .Name | pascal }}Ids: {{ get_type $g.Config.IDType }}[];
-        {{- end  }}
+        {{- if edge_field . | not }}
+            {{- if .Unique}}
+                {{ camel .Name }}Id{{- if not .Required}}?{{- end}}: {{ get_type $g.Config.IDType }};
+            {{- else}}
+                add{{ singular .Name | pascal }}Ids: {{ get_type $g.Config.IDType }}[];
+            {{- end  }}
+        {{- end }}
     {{- end}}
 }
 
@@ -35,13 +37,15 @@ export interface {{ pascal .Name }}UpdateInput{
         {{ get_name . }}{{- if is_slice . | not }}?{{ end }}: {{ get_type .Info }};
     {{- end}}
     {{- range .Edges}}
-        {{- if .Unique}}
-            {{ camel .Name }}Id{{- if not .Required}}?{{- end}}: {{ get_type $g.Config.IDType }};
-        {{- else}}
-            add{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
-            remove{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
-            clear{{ pascal .Name }}?: boolean;
-        {{- end  }}
+        {{- if edge_field . | not }}
+            {{- if .Unique}}
+                {{ camel .Name }}Id{{- if not .Required}}?{{- end}}: {{ get_type $g.Config.IDType }};
+            {{- else}}
+                add{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
+                remove{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
+                clear{{ pascal .Name }}?: boolean;
+            {{- end  }}
+        {{- end }}
     {{- end}}
 }
 
