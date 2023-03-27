@@ -26,7 +26,7 @@ export interface {{ pascal .Name }}CreateInput{
             {{- if .Unique}}
                 {{ camel .Name }}Id{{- if not .Required}}?{{- end}}: {{ get_type $g.Config.IDType }};
             {{- else}}
-                add{{ singular .Name | pascal }}Ids: {{ get_type $g.Config.IDType }}[];
+                add{{ singular .Name | pascal }}Ids?: {{ get_type $g.Config.IDType }}[];
             {{- end  }}
         {{- end }}
     {{- end}}
@@ -41,8 +41,8 @@ export interface {{ pascal .Name }}UpdateInput{
             {{- if .Unique}}
                 {{ camel .Name }}Id{{- if not .Required}}?{{- end}}: {{ get_type $g.Config.IDType }};
             {{- else}}
-                add{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
-                remove{{ singular .Name | pascal }}Ids: {{ id_type $s }}[];
+                add{{ singular .Name | pascal }}Ids?: {{ id_type $s }}[];
+                remove{{ singular .Name | pascal }}Ids?: {{ id_type $s }}[];
                 clear{{ pascal .Name }}?: boolean;
             {{- end  }}
         {{- end }}
